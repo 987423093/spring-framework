@@ -16,11 +16,11 @@
 
 package org.springframework.scheduling.aspectj;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.Future;
-
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.scheduling.annotation.Async;
+
+import java.lang.reflect.Method;
+import java.util.concurrent.Future;
 
 /**
  * Aspect to route methods based on Spring's {@link Async} annotation.
@@ -74,7 +74,6 @@ public aspect AnnotationAsyncExecutionAspect extends AbstractAsyncExecutionAspec
 
 	declare warning:
 		execution(!(void || Future+) (@Async *).*(..)):
-		"Methods in a class marked with @Async that do not return void or Future will " +
-		"be routed synchronously";
+		"Methods in a class marked with @Async that do not return void or Future will be routed synchronously";
 
 }

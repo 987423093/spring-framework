@@ -16,24 +16,16 @@
 
 package org.springframework.beans.factory.support;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.cglib.core.SpringNamingPolicy;
-import org.springframework.cglib.proxy.Callback;
-import org.springframework.cglib.proxy.CallbackFilter;
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.Factory;
-import org.springframework.cglib.proxy.MethodInterceptor;
-import org.springframework.cglib.proxy.MethodProxy;
-import org.springframework.cglib.proxy.NoOp;
+import org.springframework.cglib.proxy.*;
 import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 /**
  * Default object instantiation strategy for use in BeanFactories.
@@ -140,7 +132,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		private Class<?> createEnhancedSubclass(RootBeanDefinition beanDefinition) {
 			Enhancer enhancer = new Enhancer();
 			enhancer.setSuperclass(beanDefinition.getBeanClass());
-			enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
+			//enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
 			enhancer.setCallbackFilter(new MethodOverrideCallbackFilter(beanDefinition));
 			enhancer.setCallbackTypes(CALLBACK_TYPES);
 			return enhancer.createClass();

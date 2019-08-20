@@ -22,7 +22,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
-
 /**
  * Abstract superaspect for AspectJ transaction aspects. Concrete
  * subaspects will implement the {@code transactionalMethodExecution()}
