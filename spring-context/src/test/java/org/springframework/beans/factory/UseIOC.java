@@ -23,4 +23,11 @@ public class UseIOC {
         //装载资源
         reader.loadBeanDefinitions(resource);
     }
+
+    @Test
+    public void testCharacterLetter(){
+
+        System.out.println(Boolean.TRUE.equals(Character.isLetter('a')));
+
+    }
 }

@@ -16,13 +16,12 @@
 
 package org.springframework.beans.factory.xml;
 
-import java.io.IOException;
-
+import org.springframework.util.Assert;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import org.springframework.util.Assert;
+import java.io.IOException;
 
 /**
  * {@link EntityResolver} implementation that delegates to a {@link BeansDtdResolver}
@@ -58,7 +57,9 @@ public class DelegatingEntityResolver implements EntityResolver {
 	 * (can be {@code null}) to use the default ClassLoader)
 	 */
 	public DelegatingEntityResolver(ClassLoader classLoader) {
+		//Spring-bean dtd解码器，从classPath或者.jar中加载dtd
 		this.dtdResolver = new BeansDtdResolver();
+		//读取classpath下的所有META-INF/spring.schemas成为一个namespaceURL和本地schema文件地址的map
 		this.schemaResolver = new PluggableSchemaResolver(classLoader);
 	}
 

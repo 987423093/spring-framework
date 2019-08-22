@@ -16,18 +16,17 @@
 
 package org.springframework.beans.factory.xml;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 /**
  * EntityResolver implementation that tries to resolve entity references
@@ -71,14 +70,20 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 
 	@Override
 	public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+		//继承自DelegatingEntityResolver，用父类加载获得inputSource
 		InputSource source = super.resolveEntity(publicId, systemId);
+		//加载失败则使用resourceLoader进行解析
 		if (source == null && systemId != null) {
 			String resourcePath = null;
 			try {
+				//编码
 				String decodedSystemId = URLDecoder.decode(systemId, "UTF-8");
+				//转换成URL字符串
 				String givenUrl = new URL(decodedSystemId).toString();
+				//系统根路径
 				String systemRootUrl = new File("").toURI().toURL().toString();
 				// Try relative to resource base if currently in system root.
+				//获得相对资源路径
 				if (givenUrl.startsWith(systemRootUrl)) {
 					resourcePath = givenUrl.substring(systemRootUrl.length());
 				}
@@ -95,7 +100,9 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Trying to locate XML entity [" + systemId + "] as resource [" + resourcePath + "]");
 				}
+				//获得资源
 				Resource resource = this.resourceLoader.getResource(resourcePath);
+				//创建inputSource对象
 				source = new InputSource(resource.getInputStream());
 				source.setPublicId(publicId);
 				source.setSystemId(systemId);

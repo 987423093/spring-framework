@@ -16,13 +16,9 @@
 
 package org.springframework.util.xml;
 
-import java.io.BufferedReader;
-import java.io.CharConversionException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import org.springframework.util.StringUtils;
+
+import java.io.*;
 
 /**
  * Detects whether an XML stream is using DTD- or XSD-based validation.
@@ -90,17 +86,23 @@ public class XmlValidationModeDetector {
 		// Peek into the file to look for DOCTYPE.
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		try {
+			//默认非DTD
 			boolean isDtdValidated = false;
 			String content;
 			while ((content = reader.readLine()) != null) {
+				//得到处理注释之后的串
 				content = consumeCommentTokens(content);
+				//true说明注释还没结束
+				//或者是空串
 				if (this.inComment || !StringUtils.hasText(content)) {
 					continue;
 				}
+				//如果包含了DOCTYPE说明是DTD解析方式
 				if (hasDoctype(content)) {
 					isDtdValidated = true;
 					break;
 				}
+				//如果前面是<并且后面带着字母
 				if (hasOpeningTag(content)) {
 					// End of meaningful data...
 					break;
@@ -147,10 +149,17 @@ public class XmlValidationModeDetector {
 	 * the DOCTYPE declaration or the root element of the document.
 	 */
 	private String consumeCommentTokens(String line) {
+		//没有<!--和-->肯定不是注释
 		if (!line.contains(START_COMMENT) && !line.contains(END_COMMENT)) {
 			return line;
 		}
+		//aaaa<!-- bbbb --> c
+		//1.bbbb --> c
+		//2.c
+		//会把注释前面的也删去BUG？
 		while ((line = consume(line)) != null) {
+			//如果inComment=false说明执行了一个组合前缀和后缀（只是有匹配，因为有可能是上一行带过来的） 返回去除整个<!-- -->嵌套的串
+			//防止出现<  !--情况，如果出现了会在跑上面的方法返回空忽略
 			if (!this.inComment && !line.trim().startsWith(START_COMMENT)) {
 				return line;
 			}
@@ -164,6 +173,7 @@ public class XmlValidationModeDetector {
 	 */
 	private String consume(String line) {
 		int index = (this.inComment ? endComment(line) : startComment(line));
+		//如果是后缀会变为空串
 		return (index == -1 ? null : line.substring(index));
 	}
 
@@ -187,8 +197,10 @@ public class XmlValidationModeDetector {
 	private int commentToken(String line, String token, boolean inCommentIfPresent) {
 		int index = line.indexOf(token);
 		if (index > - 1) {
+			//前后缀不断交替
 			this.inComment = inCommentIfPresent;
 		}
+		//<!--ABC  -> 得到A位置
 		return (index == -1 ? index : index + token.length());
 	}
 
